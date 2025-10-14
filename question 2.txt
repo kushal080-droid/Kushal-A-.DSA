@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int id;
+    struct Node* next;
+};
+
+struct Node* createNode(int id) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->id = id;
+    newNode->next = NULL;
+    return newNode;
+}
+
+void printList(struct Node* head) {
+    while (head) {
+        printf("%d", head->id);
+        if (head->next)
+            printf(" -> ");
+        head = head->next;
+    }
+    printf("\n");
+}
+
+struct Node* reversePlaylistSegment(struct Node* head, int m, int n) {
+    if (!head || m == n)
+        return head;
+
+    struct Node dummy;
+    dummy.next = head;
+    struct Node* prev = &dummy;
+
+    // Move prev to node before m-th
+    for (int i = 1; i < m; i++)
+        prev = prev->next;
+
+    struct Node* start = prev->next;
+    struct Node* then = start->next;
+
+    // Reverse segment
+    for (int i = 0; i < n - m; i++) {
+        start->next = then->next;
+        then->next = prev->next;
+        prev->next = then;
+        then = start->next;
+    }
+
+    return dummy.next;
+}
+
+int main() {
+    int ids[] = {101, 102, 103, 104, 105, 106, 107};
+    int n = sizeof(ids) / sizeof(ids[0]);
+
+    struct Node* head = createNode(ids[0]);
+    struct Node* temp = head;
+
+    for (int i = 1; i < n; i++) {
+        temp->next = createNode(ids[i]);
+        temp = temp->next;
+    }
+
+    printf("Original playlist:\n");
+    printList(head);
+
+    int m = 2, end = 5;
+    head = reversePlaylistSegment(head, m, end);
+
+    printf("\nModified playlist:\n");
+    printList(head);
+
+    return 0;
+}
